@@ -1,11 +1,49 @@
 """
 Lector de PDFs para el sistema RAG
-Extrae texto de archivos PDF de catálogos de productos
-Adaptado del Taller Sesión 6
+Extrae texto de las resoluciones de INDECOPI
 """
 from pathlib import Path
 from typing import List, Dict
 import re
+
+
+# Patrones para redactar datos sensibles de las resoluciones antes de
+# indexarlas: nombres de personas y lugar de los hechos denunciados.
+# DNI, montos de dinero y fechas se resuelven aparte, con un solo paso
+# que elimina todos los dígitos del texto (ver _redact_sensitive_data).
+# Es una limpieza best-effort a nivel de texto (no reemplaza el filtro
+# de security.py, que sigue siendo la última barrera sobre lo que ve el
+# usuario en el chat).
+_PLACEHOLDER = "[DATO PROTEGIDO]"
+
+# Nombres de personas: texto en mayúscula inicial (o todo en mayúsculas,
+# formato común en resoluciones peruanas) después de una etiqueta típica
+# (denunciante, Sr./Sra., "nombres y apellidos", etc.). La etiqueta es
+# insensible a mayúsculas/minúsculas vía (?i:...), pero el grupo
+# capturado no, para no confundir palabras comunes con nombres propios.
+_NAME_LABEL_PATTERN = re.compile(
+    r'(?i:denunciante|denunciad[oa]|demandante|demandad[oa]|recurrente|'
+    r'apelante|infractor|sr\.|sra\.|srta\.|señor|señora|don|doña|'
+    r'nombres?\s+y\s+apellidos)\s*:?\s+'
+    r'(?P<nombre>[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑa-záéíóúñ]*'
+    r'(?:\s+[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑa-záéíóúñ]*){1,4})'
+)
+
+# Lugar de los hechos: texto tras frases típicas de ubicación
+_PLACE_PATTERN = re.compile(
+    r'(?:en la ciudad de|en el distrito de|en la provincia de|'
+    r'en el departamento de|domiciliad[oa] en|domicilio en|'
+    r'lugar de los hechos)\s*:?\s+'
+    r'(?P<lugar>[A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ.\s]{2,60}?)(?=[.,;\n]|$)',
+    re.IGNORECASE
+)
+
+
+def _redact_named_group(match: re.Match) -> str:
+    """Conserva la etiqueta (ej. 'denunciante:') y redacta solo el grupo capturado"""
+    start, end = match.span()
+    group_start, group_end = match.span(1)
+    return match.string[start:group_start] + _PLACEHOLDER + match.string[group_end:end]
 
 
 class PDFReader:
@@ -49,16 +87,41 @@ class PDFReader:
             print(f"Error al leer {pdf_path}: {e}")
             return ""
 
+    def _redact_sensitive_data(self, text: str) -> str:
+        """
+        Redacta de las resoluciones los datos sensibles antes de indexarlas:
+        nombres de personas y lugar de los hechos (por etiqueta), y todos
+        los dígitos del texto (cubre DNI, montos de dinero y fechas de
+        una sola vez). Se aplica sobre el texto original (con mayúsculas
+        y puntuación intactas) porque los patrones de nombres y lugar
+        dependen de ese formato.
+
+        Args:
+            text: Texto original extraído del PDF
+
+        Returns:
+            Texto sin nombres, lugares ni dígitos
+        """
+        text = _NAME_LABEL_PATTERN.sub(_redact_named_group, text)
+        text = _PLACE_PATTERN.sub(_redact_named_group, text)
+        # Quitar todo dígito: cubre DNI, montos de dinero y fechas de un
+        # solo golpe (también borra números de resolución/expediente).
+        text = re.sub(r'\d+', ' ', text)
+        return text
+
     def clean_text(self, text: str) -> str:
         """
-        Limpia el texto extraído del PDF
+        Redacta datos sensibles y limpia el texto extraído del PDF
 
         Args:
             text: Texto a limpiar
 
         Returns:
-            Texto limpio
+            Texto limpio, sin datos sensibles
         """
+        # Redactar datos sensibles primero (necesita mayúsculas/puntuación)
+        text = self._redact_sensitive_data(text)
+
         # Eliminar múltiples espacios
         text = re.sub(r'[ \t]+', ' ', text)
 
@@ -198,7 +261,7 @@ def main():
     from config import Config
 
     print("=" * 70)
-    print("LECTOR DE PDFs - TALLER SESIÓN 7")
+    print("LECTOR DE PDFs - RESOLUCIONES INDECOPI")
     print("=" * 70 + "\n")
 
     # Crear lector

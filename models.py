@@ -1,6 +1,5 @@
 """
 Modelos Pydantic para Requests y Responses de la API
-Taller Sesión 7 - Sistema RAG + Chatbot Autónomo
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -26,13 +25,13 @@ class CreateUserRequest(BaseModel):
 class ChatRequest(BaseModel):
     """Request para enviar un mensaje al chatbot"""
     user_id: str = Field(..., description="ID del usuario")
-    message: str = Field(..., description="Mensaje del usuario")
+    message: str = Field(..., max_length=500, description="Mensaje del usuario (máx. 500 caracteres)")
 
     class Config:
         json_schema_extra = {
             "example": {
                 "user_id": "user123",
-                "message": "¿Qué productos tienen disponibles?"
+                "message": "¿Cómo presento una denuncia ante INDECOPI?"
             }
         }
 
@@ -45,7 +44,7 @@ class SearchRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "query": "laptops con buena memoria",
+                "query": "fraude con tarjeta de crédito",
                 "top_k": 3
             }
         }
@@ -139,8 +138,8 @@ class ChatResponse(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "reasoning": "El usuario pregunta por laptops. Buscaré en el catálogo.",
-                "to_user": "Tenemos varias laptops disponibles. La HP Pavilion tiene 16GB RAM...",
+                "reasoning": "Respondido con FAQ (score=0.87): 'Cómo presento una denuncia ante INDECOPI'",
+                "to_user": "Primero, reclama directamente con el proveedor/empresa...",
                 "data": None,
                 "action": {"command": "none", "params": {}},
                 "action_result": None,

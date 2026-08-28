@@ -1,6 +1,5 @@
 """
-Servicio LLM integrado con Qwen de Alibaba + RAG
-Genera respuestas JSON estructuradas con acciones para el sistema de ventas
+Servicio LLM del Chatbot INDECOPI: orquesta FAQ, RAG y el modelo Qwen
 """
 import json
 from datetime import datetime
@@ -68,7 +67,7 @@ class ChatbotService:
 
         # Validar configuración
         if not Config.LLM_API_KEY:
-            raise ValueError("ALIBABA_API_KEY no está configurada en .env")
+            raise ValueError("HF_API_KEY no está configurada en .env")
 
         # Cliente OpenAI - Hugging Face (inference provider) para Qwen
         self.client = OpenAI(
@@ -332,7 +331,7 @@ def main():
 
     if not rag.is_ready():
         print("Advertencia: El servicio RAG no está disponible.")
-        print("El chatbot funcionará sin contexto de catálogos.\n")
+        print("El chatbot funcionará sin contexto de resoluciones de INDECOPI.\n")
 
     # Inicializar chatbot
     try:
