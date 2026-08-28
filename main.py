@@ -194,7 +194,7 @@ def clear_chat_history(request: Request, user_id: str):
 @limiter.limit("30/minute")
 def search_documents(request: Request, data: SearchRequest):
     """
-    Búsqueda semántica en los catálogos de productos
+    Búsqueda semántica en las resoluciones de INDECOPI
 
     Utiliza FAISS para encontrar los documentos más relevantes
     basándose en similitud de embeddings.

@@ -1,6 +1,5 @@
 """
-Configuración del Taller Sesión 7
-Sistema RAG + Chatbot Autónomo con registro de ventas
+Configuración centralizada del Chatbot INDECOPI
 """
 import os
 from pathlib import Path
@@ -17,10 +16,8 @@ class Config:
     BASE_DIR = Path(__file__).parent
     PDFS_DIR = BASE_DIR / "pdfs" / "Resoluciones_INDECOPI"
     DATA_DIR = BASE_DIR / "data"
-    # VENTAS_CSV = DATA_DIR / "ventas.csv"
-    # INVENTARIO_JSON = DATA_DIR / "inventario.json"
 
-    # ===== LLM - Qwen de Alibaba =====
+    # ===== LLM - Qwen (Hugging Face) =====
     # Usa la API compatible con OpenAI
     LLM_API_KEY = os.getenv("HF_API_KEY", "")
     EMBBEDING_API_KEY = os.getenv("OPENAI_API_KEY", "")
@@ -79,7 +76,7 @@ class Config:
         errors = []
 
         if not cls.LLM_API_KEY:
-            errors.append("ALIBABA_API_KEY no está configurada")
+            errors.append("HF_API_KEY no está configurada")
 
         if not cls.PDFS_DIR.exists():
             errors.append(f"Directorio de PDFs no existe: {cls.PDFS_DIR}")

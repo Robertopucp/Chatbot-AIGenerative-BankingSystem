@@ -19,19 +19,20 @@ palabras_in = [
     "hacker",
     "datos personales",
     "dni",
-    "multas"
+    "lugar",
+    "fecha",
+    "hora",
+    "monto",
+    "multa",
+    "sancion"
 ]
 
 palabras_out = list(palabras_in)
 
 # Respuestas genéricas cuando se detecta contenido prohibido
 responses = [
-    "Lo siento, pero no puedo responder a tu pregunta.",
-    "Por ahora no puedo responder a tu pregunta.",
-    "Lo siento, no se peude brindar información de montos de multas o sanciones.",
-    "Lo siento, no puedo generar una respuesta para tu pregunta.",
-    "Lo siento, mi función no es responder ese tipo de consultas.",
-    "Disculpa, esa consulta está fuera de mi ámbito de asistencia."
+"Lo siento, no puedo procesar esa solicitud pues involucra datos privados o sensibles de las partes involucradas en el proceso civil mediante INDECOPI.",
+"No puede responser a tu pregunta pues va en contra de mi configuración de protección de datos privados y sensibles de las resoluciones finales de INDECOPI.",
 ]
 
 

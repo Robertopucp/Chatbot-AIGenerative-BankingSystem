@@ -1,9 +1,8 @@
 """
 Servicio RAG (Retrieval Augmented Generation) con LangChain + FAISS
-Proporciona contexto relevante de los catálogos de productos para el chatbot
+Proporciona contexto relevante de las resoluciones de INDECOPI para el chatbot
 
-Versión incremental (Sesión 7):
-- Embeddings vía API de Open AI
+- Embeddings vía API de OpenAI
 - Búsqueda con umbral de similitud (RAG_SCORE_THRESHOLD)
 - Búsqueda MMR (Maximal Marginal Relevance) para mayor diversidad
 - Respuesta RAG directa con citación de fuentes (answer_question)
@@ -72,7 +71,6 @@ class RAGService:
 
         Args:
             index_dir: Directorio del índice FAISS (None = usa Config.FAISS_INDEX_DIR)
-                       Útil para tener índices separados, ej: anatomía, catálogos, etc.
         """
         print("Inicializando servicio RAG...")
 
@@ -118,8 +116,8 @@ class RAGService:
         Args:
             pdfs_dir: Directorio con PDFs (usa Config.PDFS_DIR por defecto)
             file_filter: Función que recibe el nombre del archivo y devuelve
-                         True si debe indexarse (permite indexar por tema,
-                         ej: solo catálogos o solo anatomía)
+                         True si debe indexarse (permite indexar por subconjuntos
+                         de resoluciones)
 
         Returns:
             Número de chunks indexados
@@ -332,9 +330,9 @@ class RAGService:
                         threshold: float = None, top_k_sources: int = 3) -> Dict:
         """
         Respuesta RAG directa: recupera contexto relevante y genera una
-        respuesta con el LLM (qwen-plus) usando un prompt RAG estándar.
+        respuesta con el LLM (Qwen) usando un prompt RAG estándar.
 
-        Estructura del prompt (según Sesión 7):
+        Estructura del prompt:
             system → rol e instrucciones
             context → documentos recuperados del vector DB
             question → pregunta del usuario
@@ -424,7 +422,7 @@ class RAGService:
         results = self.search(query, k)
 
         if not results:
-            return "No se encontró información relevante en los catálogos."
+            return "No se encontró información relevante en las resoluciones de INDECOPI."
 
         # Formatear contexto
         context_parts = []
