@@ -1,0 +1,54 @@
+# ==============================================
+# Taller Sesión 7 - Sistema RAG + Chatbot
+# Versiones verificadas: 2026-05-11
+# Actualizado: 2026-08-25 (embeddings vía API Alibaba + notebooks)
+# ==============================================
+
+# Framework web
+fastapi==0.136.1
+uvicorn==0.46.0
+
+# LLM - Cliente OpenAI (compatible con Alibaba Qwen)
+openai==2.36.0
+
+# RAG - LangChain + FAISS
+langchain==1.2.18
+langchain-classic==1.0.7
+langchain-community==0.4.1
+langchain-core==1.3.3
+langchain-text-splitters==1.1.2
+faiss-cpu==1.13.2
+
+# Embeddings locales (opcional: EMBEDDING_PROVIDER=sentence-transformers)
+sentence-transformers==5.4.1
+
+# Lectura de PDFs
+pypdf==6.11.0
+
+# Modelos y validación
+pydantic==2.13.4
+
+# Variables de entorno
+python-dotenv==1.2.2
+
+# Utilidades
+tqdm==4.67.3
+numpy==2.2.6
+
+# Telegram bot
+python-telegram-bot==22.7
+
+# Rate limiting
+slowapi==0.1.9
+
+# ==============================================
+# NUEVO (2026-08-25): notebooks para probar cada parte
+# ==============================================
+jupyter>=1.0
+ipykernel>=6.0
+nbformat>=5.0
+
+# ==============================================
+# Testing
+# ==============================================
+pytest==9.0.3
